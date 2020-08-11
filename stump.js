@@ -1,7 +1,7 @@
-
+// Stump core
 export function stump(targetID, view, state = {}) {
 	const target = document.getElementById(targetID);
-	render(dispatch, target, view, state);
+	update(dispatch, target, view(state), undefined, 0);
 
 	function dispatch(fn) {
 		state = fn(state);
@@ -9,10 +9,26 @@ export function stump(targetID, view, state = {}) {
 	}
 }
 
-function render(dispatch, target, view, state) {
-	return update(dispatch, target, view(state), undefined, 0);
+// Shortcut aliases for basic types
+export const c = opts => new Component(opts);
+export const dispatcher = fn => new Dispatcher(fn);
+export const action = fn => dispatcher(dispatch => dispatch(fn))
+
+// Helper types
+const eventFn = (dispatch, val) => evt => val.fn(evt, dispatch)
+
+// Base types
+function Component({ type, children = [], options = {} }) {
+	this.type = type;
+	this.children = children;
+	this.options = options;
 }
 
+function Dispatcher(dispatch) {
+	this.fn = dispatch;
+}
+
+// Funcs
 function create(dispatch, component) {
 	if (typeof component === 'string') {
 		return document.createTextNode(component);
@@ -22,6 +38,16 @@ function create(dispatch, component) {
 	createChildren(dispatch, component.children, n);
 	setOptions(dispatch, n, component.options);
 	return n;
+}
+
+function createChildren(dispatch, children, n) {
+	if (!children) {
+		return;
+	}
+
+	children
+		.map(child => create(dispatch, child))
+		.forEach(n.appendChild.bind(n));
 }
 
 function setOptions(dispatch, n, options) {
@@ -60,31 +86,8 @@ function getEventValue(dispatch, val) {
 	return eventFn(dispatch, val);
 }
 
-const eventFn = (dispatch, val) => evt => {
-	preventDefault(evt);
-	val.fn(dispatch);
-}
-
-function preventDefault(evt) {
-	if (!evt || !evt.preventDefault) {
-		return
-	}
-
-	evt.preventDefault()
-}
-
 function isDispatcher(val) {
 	return !!val.constructor && val.constructor === Dispatcher
-}
-
-function createChildren(dispatch, children, n) {
-	if (!children) {
-		return;
-	}
-
-	children
-		.map(child => create(dispatch, child))
-		.forEach(n.appendChild.bind(n));
 }
 
 function update(dispatch, parent, newNode, oldNode, index = 0) {
@@ -152,29 +155,8 @@ function hasValueChanged(a, b) {
 	return typeof a === "string" && a !== b;
 }
 
-
 function getIteratingLength(a, b) {
 	const newLength = a.children.length;
 	const oldLength = b.children.length;
 	return newLength > oldLength ? newLength : oldLength;
 }
-
-
-// Base types
-export function Component({ type, children = [], options = {} }) {
-	this.type = type;
-	this.children = children;
-	this.options = options;
-}
-
-export function Dispatcher(dispatch) {
-	this.fn = dispatch;
-}
-
-// Shortcut aliases for basic types
-export const c = opts => new Component(opts);
-
-export const dispatcher = fn => new Dispatcher(fn);
-
-export const action = fn => dispatcher(dispatch => dispatch(fn))
-
