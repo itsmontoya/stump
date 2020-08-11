@@ -1,0 +1,22 @@
+{
+  "name": "stump",
+  "version": "v0.1.1",
+  "description": "Declarative UI Framework",
+  "main": "stump.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/itsmontoya/stump.git"
+  },
+  "keywords": [
+    "stump"
+  ],
+  "author": "itsMontoya",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/itsmontoya/stump/issues"
+  },
+  "homepage": "https://github.com/itsmontoya/stump#readme"
+}
