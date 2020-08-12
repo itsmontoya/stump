@@ -2,7 +2,7 @@
 export function stump(targetID, view, state = {}, dispatchers = []) {
 	const target = document.getElementById(targetID);
 	update(dispatch, target, view(state), undefined, 0);
-	launchDispatchers(dispatchers);
+	launchDispatchers(dispatch, dispatchers);
 
 	function dispatch(fn) {
 		state = fn(state);
@@ -10,7 +10,7 @@ export function stump(targetID, view, state = {}, dispatchers = []) {
 	}
 }
 
-function launchDispatchers(dispatchers) {
+function launchDispatchers(dispatch, dispatchers) {
 	dispatchers.forEach(dispatcher => {
 		if (!isDispatcher(dispatcher)) {
 			throw (`invalid type, expected dispatcher and received ${dispatcher}`);
