@@ -2,7 +2,8 @@
 export function stump(targetID, view, state = {}, dispatchers = []) {
 	const target = document.getElementById(targetID);
 	update(dispatch, target, view(state), undefined, 0);
-	launchDispatchers(dispatch, dispatchers);
+	dispatchers.forEach(dispatcher =>
+		launchDispatcher(dispatch, dispatcher))
 
 	function dispatch(fn) {
 		state = fn(state);
@@ -10,26 +11,30 @@ export function stump(targetID, view, state = {}, dispatchers = []) {
 	}
 }
 
-function launchDispatchers(dispatch, dispatchers) {
-	dispatchers.forEach(dispatcher => {
-		if (!isDispatcher(dispatcher)) {
-			throw (`invalid type, expected dispatcher and received ${dispatcher}`);
-		}
+function launchDispatcher(dispatch, dispatcher) {
+	if (!isDispatcher(dispatcher)) {
+		// Provided dispatcher is not the proper type, throw error
+		throw (`invalid type, expected dispatcher and received ${dispatcher}`);
+	}
 
-		dispatcher.ondispatch(dispatch);
-	})
+	// Pass dispatch to dispacher's ondispatch func
+	dispatcher.ondispatch(dispatch);
 }
 
 // Shortcut aliases for basic types
 export const c = opts => new Component(opts);
+// dispatcher is the backbone of the state updating process
 export const dispatcher = fn => ({ ondispatch: fn });
+// response is a shorthand alias for dispatchers who want to instantly update state
+export const response = fn =>
+	dispatcher(dispatch => dispatch(fn));
+// event is an event handler which passes a dispatch to the provided functino
 export const event = fn => ({ onevent: fn });
+// action is a shorthand alias for events who want to instantly update state
 export const action = fn =>
 	event((event, dispatch) =>
 		dispatch(state =>
 			fn(event, state)));
-
-
 
 // Helper types
 const eventFn = (dispatch, fn) => evt => fn(evt, dispatch);
@@ -39,10 +44,6 @@ function Component({ type, children = [], options = {} }) {
 	this.type = type;
 	this.children = children;
 	this.options = options;
-}
-
-function Dispatcher(dispatch) {
-	this.fn = dispatch;
 }
 
 // Funcs
@@ -187,8 +188,6 @@ function getIteratingLength(a, b) {
 	return newLength > oldLength ? newLength : oldLength;
 }
 
-
-
 function isEvent(val) {
 	if (typeof val !== "object") {
 		return false;
@@ -196,7 +195,6 @@ function isEvent(val) {
 
 	return typeof val.onevent === "function"
 }
-
 
 function isDispatcher(val) {
 	if (typeof val !== "object") {
