@@ -2,7 +2,7 @@
 export function stump(targetID, view, state = {}, dispatchers = []) {
 	const target = document.getElementById(targetID);
 	update(dispatch, target, view(state), undefined, 0);
-	dispatchers.forEach(dispatcher => dispatcher.ondispatch(dispatch));
+	launchDispatchers(dispatchers);
 
 	function dispatch(fn) {
 		state = fn(state);
@@ -10,11 +10,26 @@ export function stump(targetID, view, state = {}, dispatchers = []) {
 	}
 }
 
+function launchDispatchers(dispatchers) {
+	dispatchers.forEach(dispatcher => {
+		if (!isDispatcher(dispatcher)) {
+			throw (`invalid type, expected dispatcher and received ${dispatcher}`);
+		}
+
+		dispatcher.ondispatch(dispatch);
+	})
+}
+
 // Shortcut aliases for basic types
 export const c = opts => new Component(opts);
 export const dispatcher = fn => ({ ondispatch: fn });
 export const event = fn => ({ onevent: fn });
-export const action = fn => dispatcher(dispatch => dispatch(fn));
+export const action = fn =>
+	event((event, dispatch) =>
+		dispatch(state =>
+			fn(event, state)));
+
+
 
 // Helper types
 const eventFn = (dispatch, fn) => evt => fn(evt, dispatch);
@@ -179,7 +194,7 @@ function isEvent(val) {
 		return false;
 	}
 
-	return val.onevent === "function"
+	return typeof val.onevent === "function"
 }
 
 
@@ -188,5 +203,5 @@ function isDispatcher(val) {
 		return false;
 	}
 
-	return val.ondispatch === "function"
+	return typeof val.ondispatch === "function"
 }
