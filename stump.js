@@ -1,7 +1,8 @@
 // Stump core
-export function stump(targetID, view, state = {}) {
+export function stump(targetID, view, state = {}, dispatchers = []) {
 	const target = document.getElementById(targetID);
 	update(dispatch, target, view(state), undefined, 0);
+	dispatchers.forEach(dispatcher => dispatcher.ondispatch(dispatch));
 
 	function dispatch(fn) {
 		state = fn(state);
@@ -11,11 +12,12 @@ export function stump(targetID, view, state = {}) {
 
 // Shortcut aliases for basic types
 export const c = opts => new Component(opts);
-export const dispatcher = fn => new Dispatcher(fn);
-export const action = fn => dispatcher(dispatch => dispatch(fn))
+export const dispatcher = fn => ({ ondispatch: fn });
+export const event = fn => ({ onevent: fn });
+export const action = fn => dispatcher(dispatch => dispatch(fn));
 
 // Helper types
-const eventFn = (dispatch, val) => evt => val.fn(evt, dispatch)
+const eventFn = (dispatch, fn) => evt => fn(evt, dispatch);
 
 // Base types
 function Component({ type, children = [], options = {} }) {
@@ -52,7 +54,19 @@ function createChildren(dispatch, children, n) {
 
 function setOptions(dispatch, n, options) {
 	for (let key in options) {
-		n[key] = getOption(dispatch, options, key);
+		n[getOptionKey(key)] = getOption(dispatch, options, key);
+	}
+}
+
+function getOptionKey(key) {
+	switch (key) {
+		case "class":
+			return "className";
+		case "contenteditable":
+			return "contentEditable";
+
+		default:
+			return key;
 	}
 }
 
@@ -79,15 +93,12 @@ function getStyleValue(obj) {
 }
 
 function getEventValue(dispatch, val) {
-	if (!isDispatcher(val)) {
+	if (!isEvent(val)) {
 		return val;
 	}
 
-	return eventFn(dispatch, val);
-}
-
-function isDispatcher(val) {
-	return !!val.constructor && val.constructor === Dispatcher
+	const fn = val.onevent;
+	return eventFn(dispatch, fn);
 }
 
 function update(dispatch, parent, newNode, oldNode, index = 0) {
@@ -159,4 +170,23 @@ function getIteratingLength(a, b) {
 	const newLength = a.children.length;
 	const oldLength = b.children.length;
 	return newLength > oldLength ? newLength : oldLength;
+}
+
+
+
+function isEvent(val) {
+	if (typeof val !== "object") {
+		return false;
+	}
+
+	return val.onevent === "function"
+}
+
+
+function isDispatcher(val) {
+	if (typeof val !== "object") {
+		return false;
+	}
+
+	return val.ondispatch === "function"
 }
