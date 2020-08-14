@@ -116,7 +116,7 @@ export type dispatch = (fn: response) => void;
 
 export type response = (state: state) => state;
 
-export type event = (evt: Event, dispatch: dispatch) => void;
+export type event = (evt: (Event | any), dispatch: dispatch) => void;
 
 export type action = (evt: Event, state: state) => state;
 

@@ -88,7 +88,7 @@ export interface componentOpts {
 export declare type ondispatch = (dispatch: dispatch) => void;
 export declare type dispatch = (fn: response) => void;
 export declare type response = (state: state) => state;
-export declare type event = (evt: Event, dispatch: dispatch) => void;
+export declare type event = (evt: (Event | any), dispatch: dispatch) => void;
 export declare type action = (evt: Event, state: state) => state;
 export declare type element = Element | ChildNode;
 export declare type maybeelement = element | undefined;
