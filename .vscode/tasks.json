@@ -1,0 +1,11 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Webpack build and watch",
+            "type": "shell",
+            "command": "webpack",
+            "problemMatcher": []
+        }
+    ]
+}
