@@ -120,15 +120,15 @@ export type event = (evt: Event, dispatch: dispatch) => void;
 
 export type action = (evt: Event, state: state) => state;
 
-type element = Element | ChildNode;
+export type element = Element | ChildNode;
 
-type child = component | string;
+export type maybeelement = element | undefined;
+
+export type child = component | string;
+
+export type maybechild = child | undefined;
 
 type stringobj = { [key: string]: string; };
-
-type maybechild = child | undefined;
-
-type maybeelement = element | undefined;
 
 // Shortcut aliases for basic types
 export const c = (c: component) => ({

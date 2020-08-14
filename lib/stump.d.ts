@@ -90,7 +90,10 @@ export declare type dispatch = (fn: response) => void;
 export declare type response = (state: state) => state;
 export declare type event = (evt: Event, dispatch: dispatch) => void;
 export declare type action = (evt: Event, state: state) => state;
-declare type child = component | string;
+export declare type element = Element | ChildNode;
+export declare type maybeelement = element | undefined;
+export declare type child = component | string;
+export declare type maybechild = child | undefined;
 export declare const c: (c: component) => {
     type: string;
     children: child[];
@@ -99,4 +102,3 @@ export declare const c: (c: component) => {
 export declare const dispatcher: (fn: ondispatch) => dispatcher;
 export declare const response: (fn: response) => dispatcher;
 export declare const action: (fn: action) => (event: Event, dispatch: dispatch) => void;
-export {};
