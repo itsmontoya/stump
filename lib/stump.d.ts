@@ -5,21 +5,22 @@ declare type options = {
     state: state;
     dispatchers: [];
 };
-declare type view = (state: state) => component;
-declare type state = {};
-interface dispatcher {
+export declare type view = (state: state) => component;
+export declare type state = {};
+export interface dispatcher {
     ondispatch: ondispatch;
 }
-declare type component = {
+export declare type component = {
     type: string;
     children: (component | string)[];
     options: {};
 };
+export declare type ondispatch = (dispatch: dispatch) => void;
+export declare type dispatch = (fn: response) => void;
+export declare type response = (state: state) => state;
+export declare type event = (evt: Event, dispatch: dispatch) => void;
+export declare type action = (evt: Event, state: state) => state;
 declare type child = component | string;
-declare type ondispatch = (dispatch: dispatch) => void;
-declare type dispatch = (fn: response) => void;
-declare type response = (state: state) => state;
-declare type action = (evt: Event, state: state) => state;
 export declare const c: (opts: component) => {
     type: string;
     children: child[];

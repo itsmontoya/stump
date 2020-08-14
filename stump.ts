@@ -22,39 +22,37 @@ type options = {
 	dispatchers: [],
 };
 
-type view = (state: state) => component;
+export type view = (state: state) => component;
 
-type state = {};
+export type state = {};
 
-interface dispatcher {
+export interface dispatcher {
 	ondispatch: ondispatch,
 }
 
-type component = {
+export type component = {
 	type: string,
 	children: (component | string)[],
 	options: {},
 };
 
+export type ondispatch = (dispatch: dispatch) => void;
+
+export type dispatch = (fn: response) => void;
+
+export type response = (state: state) => state;
+
+export type event = (evt: Event, dispatch: dispatch) => void;
+
+export type action = (evt: Event, state: state) => state;
+
 type element = Element | ChildNode;
 
 type child = component | string;
 
-type ondispatch = (dispatch: dispatch) => void;
-
-type dispatch = (fn: response) => void;
-
-type response = (state: state) => state;
-
-type event = (evt: Event, dispatch: dispatch) => void;
-
-type action = (evt: Event, state: state) => state;
-
 type stringobj = { [key: string]: string; };
 
 type anyobj = { [key: string]: any; };
-
-type maybecomponent = component | string | undefined;
 
 type maybechild = child | undefined;
 
@@ -97,7 +95,7 @@ const eventFn = (dispatch: dispatch, fn: event) =>
 		fn(evt, dispatch);
 
 // Funcs
-function create(dispatch: dispatch, component: component | string): Element | Text {
+function create(dispatch: dispatch, component: child): Element | Text {
 	if (typeof component === 'string') {
 		// Component is type of string, create text node
 		return document.createTextNode(component);
