@@ -3,7 +3,7 @@ declare type options = {
     targetID: string;
     view: view;
     state: state;
-    dispatchers: [];
+    dispatchers: dispatcher[];
 };
 export declare type view = (state: state) => component;
 export declare type state = {};
