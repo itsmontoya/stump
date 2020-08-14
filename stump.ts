@@ -6,8 +6,10 @@ export function stump(opts: options) {
 	let state = { ...opts.state };
 
 	update(dispatch, target, opts.view(opts.state), undefined, 0);
-	opts.dispatchers.forEach(dispatcher =>
-		launchDispatcher(dispatch, dispatcher));
+	opts.dispatchers
+		.forEach(dispatcher =>
+			// Pass dispatch to dispacher's ondispatch func
+			dispatcher.ondispatch(dispatch));
 
 	function dispatch(fn: response) {
 		state = fn(state);
@@ -127,16 +129,6 @@ type stringobj = { [key: string]: string; };
 type maybechild = child | undefined;
 
 type maybeelement = element | undefined;
-
-function launchDispatcher(dispatch: dispatch, dispatcher: dispatcher) {
-	if (!isDispatcher(dispatcher)) {
-		// Provided dispatcher is not the proper type, throw error
-		throw (`invalid type, expected dispatcher and received ${dispatcher}`);
-	}
-
-	// Pass dispatch to dispacher's ondispatch func
-	dispatcher.ondispatch(dispatch);
-}
 
 // Shortcut aliases for basic types
 export const c = (opts: component) => ({
@@ -324,10 +316,6 @@ function getTagName(node: maybeelement) {
 	}
 
 	return e.tagName.toLowerCase();
-}
-
-function isFunction(val: any): boolean {
-	return typeof val === "function"
 }
 
 function isDispatcher(val: any): boolean {
