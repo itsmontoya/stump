@@ -33,7 +33,79 @@ export type state = {};
 export type component = {
 	type: string,
 	children: (component | string)[],
-	options: {},
+	options: componentOpts,
+};
+
+export interface componentOpts {
+	// Derived from properties defined on MDN:
+	// https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement
+	[key: string]: any,
+
+	onabort?: event,
+	onanimationcancel?: event,
+	onanimationend?: event,
+	onanimationiteration?: event,
+	onauxclick?: event,
+	onblur?: event,
+	oncancel?: event,
+	oncanplay?: event,
+	oncanplaythrough?: event,
+	onchange?: event,
+	onclick?: event,
+	onclose?: event,
+	oncontextmenu?: event,
+	oncopy?: event,
+	oncuechange?: event,
+	oncut?: event,
+	ondblclick?: event,
+	ondurationchange?: event,
+	onended?: event,
+	onerror?: event,
+	onfocus?: event,
+	onformdata?: event,
+	ongotpointercapture?: event,
+	oninput?: event,
+	oninvalid?: event,
+	onkeydown?: event,
+	onkeypress?: event,
+	onkeyup?: event,
+	onload?: event,
+	onloadeddata?: event,
+	onloadedmetadata?: event,
+	onloadend?: event,
+	onloadstart?: event,
+	onlostpointercapture?: event,
+	onmousedown?: event,
+	onmouseenter?: event,
+	onmouseleave?: event,
+	onmousemove?: event,
+	onmouseout?: event,
+	onmouseover?: event,
+	onmouseup?: event,
+	onpaste?: event,
+	onpause?: event,
+	onplay?: event,
+	onplaying?: event,
+	onpointercancel?: event,
+	onpointerdown?: event,
+	onpointerenter?: event,
+	onpointerleave?: event,
+	onpointermove?: event,
+	onpointerout?: event,
+	onpointerover?: event,
+	onpointerup?: event,
+	onreset?: event,
+	onresize?: event,
+	onscroll?: event,
+	onselect?: event,
+	onselectionchange?: event,
+	onselectstart?: event,
+	onsubmit?: event,
+	ontouchcancel?: event,
+	ontouchstart?: event,
+	ontransitioncancel?: event,
+	ontransitionend?: event,
+	onwheel?: event,
 };
 
 export type ondispatch = (dispatch: dispatch) => void;
@@ -117,7 +189,7 @@ function createChildren(dispatch: dispatch, node: Element, children: (component 
 		.forEach(node.appendChild.bind(node));
 }
 
-function setOptions(dispatch: dispatch, node: Element, options: {}) {
+function setOptions(dispatch: dispatch, node: Element, options: componentOpts) {
 	for (let key in options) {
 		const optKey = getOptionKey(key)
 		const optValue = getOption(dispatch, options, key);
@@ -137,14 +209,15 @@ function getOptionKey(key: string): string {
 	}
 }
 
-function getOption(dispatch: dispatch, options: anyobj, key: string): string | any {
+function getOption(dispatch: dispatch, options: componentOpts, key: string): string | any {
 	const val = options[key];
 	if (key === "style") {
 		return getStyleValue(val);
 	}
 
 	if (key.substr(0, 2) === "on") {
-		return getEventValue(dispatch, val);
+		const evt = <event>val;
+		return eventFn(dispatch, evt);
 	}
 
 	return val;
@@ -157,15 +230,6 @@ function getStyleValue(obj: stringobj) {
 	}
 
 	return arr.join(" ");
-}
-
-function getEventValue(dispatch: dispatch, val: any) {
-	if (!isEvent(val)) {
-		return val;
-	}
-
-	const fn = val.onevent;
-	return eventFn(dispatch, fn);
 }
 
 function update(dispatch: dispatch, parent: element, newNode: maybechild, oldNode: maybeelement, index: number = 0) {
@@ -264,15 +328,11 @@ function getTagName(node: maybeelement) {
 	return e.tagName.toLowerCase();
 }
 
-function isEvent(val: any) {
-	if (typeof val !== "object") {
-		return false;
-	}
-
-	return typeof val.onevent === "function"
+function isFunction(val: any): boolean {
+	return typeof val === "function"
 }
 
-function isDispatcher(val: any) {
+function isDispatcher(val: any): boolean {
 	if (typeof val !== "object") {
 		return false;
 	}
