@@ -30,7 +30,7 @@ export type options = {
 
 export type view = (state: state) => component;
 
-export type state = {};
+export type state = { [key: string]: any };
 
 export type component = {
 	type: string,

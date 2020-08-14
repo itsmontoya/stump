@@ -9,7 +9,9 @@ export declare type options = {
     dispatchers: dispatcher[];
 };
 export declare type view = (state: state) => component;
-export declare type state = {};
+export declare type state = {
+    [key: string]: any;
+};
 export declare type component = {
     type: string;
     children: (component | string)[];
