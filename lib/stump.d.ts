@@ -14,8 +14,8 @@ export declare type state = {
 };
 export declare type component = {
     type: string;
-    children: (component | string)[];
-    options: componentOpts;
+    children?: child[];
+    options?: componentOpts;
 };
 export interface componentOpts {
     [key: string]: any;
@@ -91,7 +91,7 @@ export declare type response = (state: state) => state;
 export declare type event = (evt: Event, dispatch: dispatch) => void;
 export declare type action = (evt: Event, state: state) => state;
 declare type child = component | string;
-export declare const c: (opts: component) => {
+export declare const c: (c: component) => {
     type: string;
     children: child[];
     options: componentOpts;

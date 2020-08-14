@@ -34,8 +34,8 @@ export type state = { [key: string]: any };
 
 export type component = {
 	type: string,
-	children: (component | string)[],
-	options: componentOpts,
+	children?: child[],
+	options?: componentOpts,
 };
 
 export interface componentOpts {
@@ -131,10 +131,10 @@ type maybechild = child | undefined;
 type maybeelement = element | undefined;
 
 // Shortcut aliases for basic types
-export const c = (opts: component) => ({
-	type: opts.type,
-	children: opts.children,
-	options: opts.options
+export const c = (c: component) => ({
+	type: c.type,
+	children: c.children || [],
+	options: c.options || {},
 });
 
 // dispatcher is the backbone of the state updating process
