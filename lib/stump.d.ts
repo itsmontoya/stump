@@ -1,5 +1,8 @@
 export declare function stump(opts: options): void;
-declare type options = {
+export interface dispatcher {
+    ondispatch: ondispatch;
+}
+export declare type options = {
     targetID: string;
     view: view;
     state: state;
@@ -7,9 +10,6 @@ declare type options = {
 };
 export declare type view = (state: state) => component;
 export declare type state = {};
-export interface dispatcher {
-    ondispatch: ondispatch;
-}
 export declare type component = {
     type: string;
     children: (component | string)[];

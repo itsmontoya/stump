@@ -15,7 +15,11 @@ export function stump(opts: options) {
 	}
 }
 
-type options = {
+export interface dispatcher {
+	ondispatch: ondispatch,
+}
+
+export type options = {
 	targetID: string,
 	view: view,
 	state: state,
@@ -25,10 +29,6 @@ type options = {
 export type view = (state: state) => component;
 
 export type state = {};
-
-export interface dispatcher {
-	ondispatch: ondispatch,
-}
 
 export type component = {
 	type: string,
