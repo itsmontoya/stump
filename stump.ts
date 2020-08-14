@@ -19,7 +19,7 @@ type options = {
 	targetID: string,
 	view: view,
 	state: state,
-	dispatchers: [],
+	dispatchers: dispatcher[],
 };
 
 export type view = (state: state) => component;
