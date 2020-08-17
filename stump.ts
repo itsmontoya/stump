@@ -120,7 +120,7 @@ export type eventValue = (Event | any);
 
 export type event = (evt: eventValue, dispatch: dispatch) => void;
 
-export type action = (evt: (Event | any), state: state) => state;
+export type action = (evt: eventValue, state: state) => state;
 
 export type element = Element | ChildNode;
 

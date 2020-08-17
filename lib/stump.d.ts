@@ -90,7 +90,7 @@ export declare type dispatch = (fn: response) => void;
 export declare type response = (state: state) => state;
 export declare type eventValue = (Event | any);
 export declare type event = (evt: eventValue, dispatch: dispatch) => void;
-export declare type action = (evt: (Event | any), state: state) => state;
+export declare type action = (evt: eventValue, state: state) => state;
 export declare type element = Element | ChildNode;
 export declare type maybeelement = element | undefined;
 export declare type child = component | string;
