@@ -2,7 +2,7 @@
 export function stump(opts) {
     const target = document.getElementById(opts.targetID);
     target.innerHTML = "";
-    let state = { ...opts.state };
+    let state = Object.assign({}, opts.state);
     update(dispatch, target, opts.view(opts.state), undefined, 0);
     opts.dispatchers
         .forEach(dispatcher => 
