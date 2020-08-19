@@ -1,11 +1,8 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.action = exports.response = exports.c = exports.stump = void 0;
 // Stump core
-function stump(opts) {
+export function stump(opts) {
     const target = document.getElementById(opts.targetID);
     target.innerHTML = "";
-    let state = Object.assign({}, opts.state);
+    let state = { ...opts.state };
     update(dispatch, target, opts.view(opts.state), undefined, 0);
     opts.dispatchers
         .forEach(dispatcher => 
@@ -16,18 +13,17 @@ function stump(opts) {
         update(dispatch, target, opts.view(state), target.children[0]);
     }
 }
-exports.stump = stump;
 ;
 // Shortcut aliases for basic types
-exports.c = (c) => ({
+export const c = (c) => ({
     type: c.type,
     children: c.children || [],
     options: c.options || {},
 });
 // response is a shorthand alias for dispatchers who want to instantly update state
-exports.response = (fn) => (dispatch) => dispatch(fn);
+export const response = (fn) => (dispatch) => dispatch(fn);
 // action is a shorthand alias for events who want to instantly update state
-exports.action = (fn) => (event, dispatch) => dispatch(state => fn(event, state));
+export const action = (fn) => (event, dispatch) => dispatch(state => fn(event, state));
 // Helper types
 const eventFn = (dispatch, fn) => (evt) => fn(evt, dispatch);
 // Funcs
