@@ -382,3 +382,4 @@ function clearFunctions(node: Element): void {
 		c[key] = undefined;
 	}
 }
+
