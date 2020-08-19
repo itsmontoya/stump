@@ -1,8 +1,8 @@
 {
   "name": "stump",
-  "version": "v0.2.19",
+  "version": "v0.2.20",
   "description": "Declarative UI Framework",
-  "main": "stump.ts",
+  "main": "lib/stump.js",
   "types": "lib/stump.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

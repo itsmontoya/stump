@@ -2,7 +2,7 @@ const path = require('path');
 
 module.exports = {
 	entry: './stump.ts',
-	mode: "production",
+	mode: "development",
 	watch: true,
 	module: {
 		rules: [
