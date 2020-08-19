@@ -1,6 +1,6 @@
 {
   "name": "stump",
-  "version": "v0.2.25",
+  "version": "v0.2.26",
   "description": "Declarative UI Framework",
   "main": "dist/stump.min.js",
   "types": "dist/stump.d.ts",
