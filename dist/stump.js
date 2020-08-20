@@ -191,9 +191,17 @@ function isEventKey(key) {
     return key.substr(0, 2) === "on";
 }
 function clearAttributes(node, options) {
-    const nodeAttr = node.attributes;
     for (let i = 0; i < node.attributes.length; i++) {
         clearAttribute(node, options, i);
+    }
+    clearValue(node, options);
+}
+function clearValue(node, options) {
+    if (!node.value) {
+        return;
+    }
+    if (!options.value) {
+        node.value = "";
     }
 }
 function clearAttribute(node, options, i) {

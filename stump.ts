@@ -353,9 +353,20 @@ function isEventKey(key: string): boolean {
 }
 
 function clearAttributes(node: Element, options: componentOpts): void {
-	const nodeAttr = node.attributes;
 	for (let i = 0; i < node.attributes.length; i++) {
 		clearAttribute(node, options, i);
+	}
+
+	clearValue(<HTMLInputElement>node, options);
+}
+
+function clearValue(node: HTMLInputElement, options: componentOpts) {
+	if (!node.value) {
+		return
+	}
+
+	if (!options.value) {
+		node.value = "";
 	}
 }
 
@@ -382,4 +393,3 @@ function clearFunctions(node: Element): void {
 		c[key] = undefined;
 	}
 }
-
