@@ -12,6 +12,10 @@ export function stump(opts: options) {
 
 	function dispatch(fn: response) {
 		state = fn(state);
+		if (opts.debug === true) {
+			console.log("State update", state);
+		}
+
 		update(dispatch, target, opts.view(state), target.children[0]);
 	}
 }
@@ -21,6 +25,7 @@ export type options = {
 	view: view,
 	state: state,
 	dispatchers: ondispatch[],
+	debug?: boolean,
 };
 
 export type view = (state: state) => component;
@@ -29,7 +34,7 @@ export type state = { [key: string]: any };
 
 export type component = {
 	type: string,
-	children?: child[],
+	children?: ChildList,
 	options?: componentOpts,
 };
 
@@ -130,7 +135,7 @@ type stringobj = { [key: string]: string; };
 // Shortcut aliases for basic types
 export const c = (c: component) => ({
 	type: c.type,
-	children: c.children || [],
+	children: c.children || (<child[]>[]),
 	options: c.options || {},
 });
 
@@ -143,6 +148,14 @@ export const action = (fn: action) =>
 	(event: Event, dispatch: dispatch) =>
 		dispatch(state =>
 			fn(event, state));
+
+export const children = (...children: child[]): Children => {
+	const c = new (Children as any)();
+	if (!!children) children.forEach((child: child) =>
+		c.append(child));
+
+	return c;
+}
 
 // Helper types
 const eventFn = (dispatch: dispatch, fn: event) =>
@@ -161,13 +174,13 @@ function create(dispatch: dispatch, component: child): Element | Text {
 	return node;
 }
 
-function createChildren(dispatch: dispatch, node: Element, children: (component | string)[]) {
+function createChildren(dispatch: dispatch, node: Element, children: ChildList) {
 	if (!children) {
 		return;
 	}
 
 	children
-		.map(child => create(dispatch, child))
+		.map((child: child) => create(dispatch, child))
 		.forEach(node.appendChild.bind(node));
 }
 
@@ -264,8 +277,8 @@ function setEventFunction(e: Element, key: string, fn: (evt: Event) => void) {
 	c["__stumpFns"].push(key);
 }
 
-function getChild(parent: component, index: number) {
-	return parent.children[index]
+function getChild(parent: component, index: number): maybechild {
+	return !parent.children ? void 0 : parent.children[index]
 }
 
 function getChildNode(parent: element, index: number): ChildNode {
@@ -392,4 +405,35 @@ function clearFunctions(node: Element): void {
 		let key = c.__stumpFns.pop();
 		c[key] = undefined;
 	}
+}
+
+interface Children {
+	[key: number]: child
+	append(child: child): Children
+	forEach(callbackfn: (child: child, index: number, array: child[]) =>
+		void, thisArg?: any): void
+	map(fn: (child: child) => any): any[]
+	length: number,
+}
+
+const Children = function () { };
+Children.prototype.push = Array.prototype.push;
+Children.prototype.map = Array.prototype.map;
+Children.prototype.length = Array.prototype.length;
+
+// Create new append method
+Children.prototype.append = function (child: child): any {
+	if (child !== null && child !== undefined) {
+		this.push(child);
+	}
+
+	return this;
+};
+
+interface ChildList {
+	[key: number]: child
+	forEach(callbackfn: (child: child, index: number, array: child[]) =>
+		void, thisArg?: any): void
+	map(fn: (child: child) => any): any[]
+	length: number,
 }

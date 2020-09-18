@@ -4,6 +4,7 @@ export declare type options = {
     view: view;
     state: state;
     dispatchers: ondispatch[];
+    debug?: boolean;
 };
 export declare type view = (state: state) => component;
 export declare type state = {
@@ -11,7 +12,7 @@ export declare type state = {
 };
 export declare type component = {
     type: string;
-    children?: child[];
+    children?: ChildList;
     options?: componentOpts;
 };
 export interface componentOpts {
@@ -94,8 +95,24 @@ export declare type child = component | string;
 export declare type maybechild = child | undefined;
 export declare const c: (c: component) => {
     type: string;
-    children: child[];
+    children: ChildList | child[];
     options: componentOpts;
 };
 export declare const response: (fn: response) => (dispatch: dispatch) => void;
 export declare const action: (fn: action) => (event: Event, dispatch: dispatch) => void;
+export declare const children: (...children: child[]) => Children;
+interface Children {
+    [key: number]: child;
+    append(child: child): Children;
+    forEach(callbackfn: (child: child, index: number, array: child[]) => void, thisArg?: any): void;
+    map(fn: (child: child) => any): any[];
+    length: number;
+}
+declare const Children: () => void;
+interface ChildList {
+    [key: number]: child;
+    forEach(callbackfn: (child: child, index: number, array: child[]) => void, thisArg?: any): void;
+    map(fn: (child: child) => any): any[];
+    length: number;
+}
+export {};

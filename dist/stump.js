@@ -10,6 +10,9 @@ export function stump(opts) {
     dispatcher(dispatch));
     function dispatch(fn) {
         state = fn(state);
+        if (opts.debug === true) {
+            console.log("State update", state);
+        }
         update(dispatch, target, opts.view(state), target.children[0]);
     }
 }
@@ -24,6 +27,12 @@ export const c = (c) => ({
 export const response = (fn) => (dispatch) => dispatch(fn);
 // action is a shorthand alias for events who want to instantly update state
 export const action = (fn) => (event, dispatch) => dispatch(state => fn(event, state));
+export const children = (...children) => {
+    const c = new Children();
+    if (!!children)
+        children.forEach((child) => c.append(child));
+    return c;
+};
 // Helper types
 const eventFn = (dispatch, fn) => (evt) => fn(evt, dispatch);
 // Funcs
@@ -42,7 +51,7 @@ function createChildren(dispatch, node, children) {
         return;
     }
     children
-        .map(child => create(dispatch, child))
+        .map((child) => create(dispatch, child))
         .forEach(node.appendChild.bind(node));
 }
 function update(dispatch, parent, child, element, index = 0) {
@@ -124,7 +133,7 @@ function setEventFunction(e, key, fn) {
     c["__stumpFns"].push(key);
 }
 function getChild(parent, index) {
-    return parent.children[index];
+    return !parent.children ? void 0 : parent.children[index];
 }
 function getChildNode(parent, index) {
     return parent.childNodes[index];
@@ -224,4 +233,15 @@ function clearFunctions(node) {
         c[key] = undefined;
     }
 }
+const Children = function () { };
+Children.prototype.push = Array.prototype.push;
+Children.prototype.map = Array.prototype.map;
+Children.prototype.length = Array.prototype.length;
+// Create new append method
+Children.prototype.append = function (child) {
+    if (child !== null && child !== undefined) {
+        this.push(child);
+    }
+    return this;
+};
 //# sourceMappingURL=stump.js.map
