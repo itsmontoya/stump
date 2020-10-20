@@ -244,4 +244,69 @@ Children.prototype.append = function (child) {
     }
     return this;
 };
+;
+export const model = (keys) => ({
+    get: (state, key) => getModelValue(keys, state, key),
+    put: (state, key, value) => putModelValue(keys, state, key, value),
+    find: (state, fn) => findModelValue(keys, state, fn),
+    model: (additionalKeys) => model([...keys, ...additionalKeys]),
+    arrayModel: (key) => newArrayModel(model([...keys]), key)
+});
+export const arrayModel = (keys) => newArrayModel(model(keys.slice(0, keys.length - 2)), keys[keys.length - 1]);
+const newArrayModel = (m, key) => ({
+    get: (state, index) => m.get(state, key)[index],
+    find: (state, fn) => m.get(state, key).find(fn),
+    append: (state, value) => m.put(state, key, [...m.get(state, key), value]),
+    appendIfNotExist: (state, value) => m.put(state, key, appendIfNotExist(m.get(state, key) || [], value))
+});
+const appendIfNotExist = (arr, value) => arr.indexOf(value) === -1
+    // Value doesn't exist, spread array and include new value
+    ? [...arr, value]
+    // No change was made, we can return our original array
+    : arr;
+const getObject = (obj, keys) => {
+    keys.forEach((key) => obj = obj[key]);
+    return Object.assign({}, obj);
+};
+const putObject = (state, keys, value) => {
+    let last = keys.length - 2;
+    if (last === -1) {
+        // Fast track for single-depth key lists
+        const key = keys[0];
+        return Object.assign(Object.assign({}, state), { [key]: value });
+    }
+    let obj = state = Object.assign({}, state);
+    // Iterate through key list
+    keys.forEach((key, i) => {
+        if (i !== last) {
+            // TODO: Determine if it's more proper to spread apply value here for safety and correctness
+            obj = obj[key];
+            return;
+        }
+        // We've reached the parent key, apply value via spread operator and insert the value for our target key
+        obj[key] = Object.assign(Object.assign({}, obj[key]), { [keys[i + 1]]: value });
+    });
+    return state;
+};
+const getModelValue = (keys, state, key) => {
+    const obj = getObject(state, keys);
+    return obj[key];
+};
+const findModelValue = (keys, state, fn) => {
+    const obj = getObject(state, keys);
+    for (let key in obj) {
+        const value = obj[key];
+        if (fn(value) === true) {
+            return value;
+        }
+        return;
+    }
+    return null;
+};
+const putModelValue = (keys, state, key, value) => {
+    state = Object.assign({}, state);
+    const obj = getObject(state, keys);
+    obj[key] = value;
+    return putObject(state, keys, obj);
+};
 //# sourceMappingURL=stump.js.map

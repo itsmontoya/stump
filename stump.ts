@@ -437,3 +437,125 @@ interface ChildList {
 	map(fn: (child: child) => any): any[]
 	length: number,
 }
+
+export interface model {
+	get: (state: any, key: string | number) => any
+	put: (state: any, key: string | number, value: any) => state
+	find: (state: any, fn: matchFn) => any
+	model: (additionalKeys: string[]) => model
+	arrayModel: (key: string) => arrayModel
+};
+
+export interface arrayModel {
+	get: (state: any, index: number) => any
+	find: (state: any, fn: matchFn) => any
+	append: (state: any, value: any) => state
+	appendIfNotExist: (state: any, value: string) => state
+}
+
+export const model = (keys: string[]) => ({
+	get: (state: any, key: string | number): any =>
+		getModelValue(keys, state, key),
+	put: (state: any, key: string | number, value: any): state =>
+		putModelValue(keys, state, key, value),
+	find: (state: any, fn: matchFn): any =>
+		findModelValue(keys, state, fn),
+	model: (additionalKeys: string[]): model =>
+		model([...keys, ...additionalKeys]),
+	arrayModel: (key: string): arrayModel =>
+		newArrayModel(model([...keys]), key)
+});
+
+export const arrayModel = (keys: string[]) =>
+	newArrayModel(
+		model(keys.slice(0, keys.length - 2)),
+		keys[keys.length - 1],
+	);
+
+const newArrayModel = (m: model, key: string) => ({
+	get: (state: any, index: number): any =>
+		m.get(state, key)[index],
+	find: (state: any, fn: matchFn): any =>
+		(<any[]>m.get(state, key)).find(fn),
+	append: (state: any, value: any): state =>
+		m.put(
+			state,
+			key,
+			[...m.get(state, key), value]
+		),
+	appendIfNotExist: (state: any, value: string): state =>
+		m.put(
+			state,
+			key,
+			appendIfNotExist(m.get(state, key) || [], value)
+		)
+});
+
+export type matchFn = (value: any) => boolean;
+
+const appendIfNotExist = (arr: string[], value: string): string[] =>
+	arr.indexOf(value) === -1
+		// Value doesn't exist, spread array and include new value
+		? [...arr, value]
+		// No change was made, we can return our original array
+		: arr;
+
+
+const getObject = (obj: any, keys: string[]): any => {
+	keys.forEach((key: string) =>
+		obj = obj[key]);
+	return { ...obj }
+};
+
+const putObject = (state: state, keys: string[], value: any): state => {
+	let last = keys.length - 2;
+	if (last === -1) {
+		// Fast track for single-depth key lists
+		const key = keys[0];
+		return { ...state, [key]: value }
+	}
+
+	let obj = state = { ...state };
+	// Iterate through key list
+	keys.forEach((key: string, i: number) => {
+		if (i !== last) {
+			// TODO: Determine if it's more proper to spread apply value here for safety and correctness
+			obj = obj[key]
+			return
+		}
+
+		// We've reached the parent key, apply value via spread operator and insert the value for our target key
+		obj[key] = {
+			...obj[key],
+			[keys[i + 1]]: value,
+		}
+	})
+
+	return state;
+};
+
+const getModelValue = (keys: string[], state: any, key: string | number): any => {
+	const obj = getObject(state, keys);
+	return obj[key];
+};
+
+const findModelValue = (keys: string[], state: any, fn: matchFn): any => {
+	const obj = getObject(state, keys);
+	for (let key in obj) {
+		const value = obj[key];
+		if (fn(value) === true) {
+			return value;
+		}
+
+		return
+	}
+
+	return null;
+};
+
+const putModelValue = (keys: string[], state: any, key: string | number, value: any): state => {
+	state = { ...state };
+	const obj = getObject(state, keys);
+	obj[key] = value;
+	return putObject(state, keys, obj)
+}
