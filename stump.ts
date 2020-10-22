@@ -407,7 +407,7 @@ function clearFunctions(node: Element): void {
 	}
 }
 
-interface Children {
+export interface Children {
 	[key: number]: child
 	append(child: child): Children
 	forEach(callbackfn: (child: child, index: number, array: child[]) =>

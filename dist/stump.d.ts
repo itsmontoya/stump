@@ -101,7 +101,7 @@ export declare const c: (c: component) => {
 export declare const response: (fn: response) => (dispatch: dispatch) => void;
 export declare const action: (fn: action) => (event: Event, dispatch: dispatch) => void;
 export declare const children: (...children: child[]) => Children;
-interface Children {
+export interface Children {
     [key: number]: child;
     append(child: child): Children;
     forEach(callbackfn: (child: child, index: number, array: child[]) => void, thisArg?: any): void;
