@@ -117,6 +117,7 @@ interface ChildList {
 }
 export interface model {
     get: (state: any, key: string | number) => any;
+    getSelf: (state: any) => any;
     put: (state: any, key: string | number, value: any) => state;
     find: (state: any, fn: matchFn) => any;
     model: (additionalKeys: string[]) => model;
@@ -124,12 +125,14 @@ export interface model {
 }
 export interface arrayModel {
     get: (state: any, index: number) => any;
+    getSelf: (state: any) => any;
     find: (state: any, fn: matchFn) => any;
     append: (state: any, value: any) => state;
     appendIfNotExist: (state: any, value: string) => state;
 }
 export declare const model: (keys: string[]) => {
     get: (state: any, key: string | number) => any;
+    getSelf: (state: any) => any;
     put: (state: any, key: string | number, value: any) => state;
     find: (state: any, fn: matchFn) => any;
     model: (additionalKeys: string[]) => model;
@@ -137,6 +140,7 @@ export declare const model: (keys: string[]) => {
 };
 export declare const arrayModel: (keys: string[]) => {
     get: (state: any, index: number) => any;
+    getSelf: (state: any) => any;
     find: (state: any, fn: matchFn) => any;
     append: (state: any, value: any) => state;
     appendIfNotExist: (state: any, value: string) => state;

@@ -440,6 +440,7 @@ interface ChildList {
 
 export interface model {
 	get: (state: any, key: string | number) => any
+	getSelf: (state: any) => any
 	put: (state: any, key: string | number, value: any) => state
 	find: (state: any, fn: matchFn) => any
 	model: (additionalKeys: string[]) => model
@@ -448,6 +449,7 @@ export interface model {
 
 export interface arrayModel {
 	get: (state: any, index: number) => any
+	getSelf: (state: any) => any
 	find: (state: any, fn: matchFn) => any
 	append: (state: any, value: any) => state
 	appendIfNotExist: (state: any, value: string) => state
@@ -456,6 +458,8 @@ export interface arrayModel {
 export const model = (keys: string[]) => ({
 	get: (state: any, key: string | number): any =>
 		getModelValue(keys, state, key),
+	getSelf: (state: any): any =>
+		getModelValue(getKeysWithoutTail(keys), state, getTailKey(keys)),
 	put: (state: any, key: string | number, value: any): state =>
 		putModelValue(keys, state, key, value),
 	find: (state: any, fn: matchFn): any =>
@@ -466,6 +470,14 @@ export const model = (keys: string[]) => ({
 		newArrayModel(model([...keys]), key)
 });
 
+const getKeysWithoutTail = (keys: string[]): string[] =>
+	[...keys]
+		.splice(keys.length - 1);
+
+
+const getTailKey = (keys: string[]): string =>
+	keys[keys.length - 1];
+
 export const arrayModel = (keys: string[]) =>
 	newArrayModel(
 		model(keys.slice(0, keys.length - 2)),
@@ -475,6 +487,8 @@ export const arrayModel = (keys: string[]) =>
 const newArrayModel = (m: model, key: string) => ({
 	get: (state: any, index: number): any =>
 		m.get(state, key)[index],
+	getSelf: (state: any): any =>
+		m.get(state, key),
 	find: (state: any, fn: matchFn): any =>
 		(<any[]>m.get(state, key)).find(fn),
 	append: (state: any, value: any): state =>

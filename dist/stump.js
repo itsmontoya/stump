@@ -247,14 +247,19 @@ Children.prototype.append = function (child) {
 ;
 export const model = (keys) => ({
     get: (state, key) => getModelValue(keys, state, key),
+    getSelf: (state) => getModelValue(getKeysWithoutTail(keys), state, getTailKey(keys)),
     put: (state, key, value) => putModelValue(keys, state, key, value),
     find: (state, fn) => findModelValue(keys, state, fn),
     model: (additionalKeys) => model([...keys, ...additionalKeys]),
     arrayModel: (key) => newArrayModel(model([...keys]), key)
 });
+const getKeysWithoutTail = (keys) => [...keys]
+    .splice(keys.length - 1);
+const getTailKey = (keys) => keys[keys.length - 1];
 export const arrayModel = (keys) => newArrayModel(model(keys.slice(0, keys.length - 2)), keys[keys.length - 1]);
 const newArrayModel = (m, key) => ({
     get: (state, index) => m.get(state, key)[index],
+    getSelf: (state) => m.get(state, key),
     find: (state, fn) => m.get(state, key).find(fn),
     append: (state, value) => m.put(state, key, [...m.get(state, key), value]),
     appendIfNotExist: (state, value) => m.put(state, key, appendIfNotExist(m.get(state, key) || [], value))
