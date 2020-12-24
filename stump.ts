@@ -452,7 +452,8 @@ export interface arrayModel {
 	getSelf: (state: any) => any
 	find: (state: any, fn: matchFn) => any
 	append: (state: any, value: any) => state
-	appendIfNotExist: (state: any, value: string) => state
+	appendIfNotExist: (state: any, value: string, fn?: matchFn) => state
+	update: (state: any, value: any, fn: matchFn) => state
 }
 
 export const model = (keys: string[]) => ({
@@ -497,23 +498,40 @@ const newArrayModel = (m: model, key: string) => ({
 			key,
 			[...m.get(state, key), value]
 		),
-	appendIfNotExist: (state: any, value: string): state =>
+	appendIfNotExist: (state: any, value: string, fn?: matchFn): state =>
 		m.put(
 			state,
 			key,
-			appendIfNotExist(m.get(state, key) || [], value)
-		)
+			appendIfNotExist(m.get(state, key), value, fn || isEqualMatch(value))
+		),
+	update: (state: any, value: any, fn: matchFn): state => m.put(
+		state,
+		key,
+		updateOrAppend(m.get(state, key), value, fn),
+	),
 });
 
 export type matchFn = (value: any) => boolean;
 
-const appendIfNotExist = (arr: string[], value: string): string[] =>
-	arr.indexOf(value) === -1
+const isEqualMatch = (target: any) =>
+	(value: any) =>
+		target === value;
+
+const appendIfNotExist = (arr: any[] = [], value: any, fn: matchFn): any[] =>
+	arr.findIndex(fn) === -1
 		// Value doesn't exist, spread array and include new value
 		? [...arr, value]
 		// No change was made, we can return our original array
 		: arr;
 
+const updateOrAppend = (arr: any[] = [], value: any, fn: matchFn): any[] => {
+	const index = arr.findIndex(fn);
+	return index === -1
+		// Value doesn't exist, spread array and include new value
+		? [...arr, value]
+		// Value exists, update within array
+		: [...arr.slice(0, index), value, ...arr.slice(index + 1)]
+}
 
 const getObject = (obj: any, keys: string[]): any => {
 	keys.forEach((key: string) =>
@@ -523,6 +541,16 @@ const getObject = (obj: any, keys: string[]): any => {
 
 const putObject = (state: state, keys: string[], value: any): state => {
 	let last = keys.length - 2;
+	switch (last) {
+		case -2:
+			// Root key depth, return value as state
+			// Note: This value has already been spread
+			return value;
+		case -1:
+			// Fast track for single-depth key lists
+			const key = keys[0];
+			return { ...state, [key]: value };
+	}
 	if (last === -1) {
 		// Fast track for single-depth key lists
 		const key = keys[0];
@@ -571,5 +599,5 @@ const putModelValue = (keys: string[], state: any, key: string | number, value: 
 	state = { ...state };
 	const obj = getObject(state, keys);
 	obj[key] = value;
-	return putObject(state, keys, obj)
+	return putObject(state, keys, obj);
 }

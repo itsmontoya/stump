@@ -262,19 +262,39 @@ const newArrayModel = (m, key) => ({
     getSelf: (state) => m.get(state, key),
     find: (state, fn) => m.get(state, key).find(fn),
     append: (state, value) => m.put(state, key, [...m.get(state, key), value]),
-    appendIfNotExist: (state, value) => m.put(state, key, appendIfNotExist(m.get(state, key) || [], value))
+    appendIfNotExist: (state, value, fn) => m.put(state, key, appendIfNotExist(m.get(state, key), value, fn || isEqualMatch(value))),
+    update: (state, value, fn) => m.put(state, key, updateOrAppend(m.get(state, key), value, fn)),
 });
-const appendIfNotExist = (arr, value) => arr.indexOf(value) === -1
+const isEqualMatch = (target) => (value) => target === value;
+const appendIfNotExist = (arr = [], value, fn) => arr.findIndex(fn) === -1
     // Value doesn't exist, spread array and include new value
     ? [...arr, value]
     // No change was made, we can return our original array
     : arr;
+const updateOrAppend = (arr = [], value, fn) => {
+    const index = arr.findIndex(fn);
+    return index === -1
+        // Value doesn't exist, spread array and include new value
+        ? [...arr, value]
+        // Value exists, update within array
+        : [...arr.slice(0, index), value, ...arr.slice(index + 1)];
+};
 const getObject = (obj, keys) => {
     keys.forEach((key) => obj = obj[key]);
     return Object.assign({}, obj);
 };
 const putObject = (state, keys, value) => {
     let last = keys.length - 2;
+    switch (last) {
+        case -2:
+            // Root key depth, return value as state
+            // Note: This value has already been spread
+            return value;
+        case -1:
+            // Fast track for single-depth key lists
+            const key = keys[0];
+            return Object.assign(Object.assign({}, state), { [key]: value });
+    }
     if (last === -1) {
         // Fast track for single-depth key lists
         const key = keys[0];
