@@ -115,37 +115,4 @@ interface ChildList {
     map(fn: (child: child) => any): any[];
     length: number;
 }
-export interface model {
-    get: (state: any, key: string | number) => any;
-    getSelf: (state: any) => any;
-    put: (state: any, key: string | number, value: any) => state;
-    find: (state: any, fn: matchFn) => any;
-    model: (additionalKeys: string[]) => model;
-    arrayModel: (key: string) => arrayModel;
-}
-export interface arrayModel {
-    get: (state: any, index: number) => any;
-    getSelf: (state: any) => any;
-    find: (state: any, fn: matchFn) => any;
-    append: (state: any, value: any) => state;
-    appendIfNotExist: (state: any, value: string, fn?: matchFn) => state;
-    update: (state: any, value: any, fn: matchFn) => state;
-}
-export declare const model: (keys: string[]) => {
-    get: (state: any, key: string | number) => any;
-    getSelf: (state: any) => any;
-    put: (state: any, key: string | number, value: any) => state;
-    find: (state: any, fn: matchFn) => any;
-    model: (additionalKeys: string[]) => model;
-    arrayModel: (key: string) => arrayModel;
-};
-export declare const arrayModel: (keys: string[]) => {
-    get: (state: any, index: number) => any;
-    getSelf: (state: any) => any;
-    find: (state: any, fn: matchFn) => any;
-    append: (state: any, value: any) => state;
-    appendIfNotExist: (state: any, value: string, fn?: matchFn) => state;
-    update: (state: any, value: any, fn: matchFn) => state;
-};
-export declare type matchFn = (value: any) => boolean;
 export {};

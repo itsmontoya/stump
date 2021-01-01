@@ -2,7 +2,7 @@
   "name": "stump",
   "version": "v0.3.3",
   "description": "Declarative UI Framework",
-  "main": "dist/stump.min.js",
+  "main": "dist/stump.js",
   "types": "dist/stump.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
