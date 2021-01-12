@@ -120,6 +120,9 @@ function setOption(dispatch, node, options, key) {
     if (isEventKey(key)) {
         setEventFunction(node, key, optValue);
     }
+    else if (key === "value") {
+        node.value = optValue;
+    }
     else {
         node.setAttribute(optKey, optValue);
     }
