@@ -261,7 +261,7 @@ function setOption(dispatch: dispatch, node: Element, options: componentOpts, ke
 	const optValue = getOption(dispatch, options, key);
 	if (isEventKey(key)) {
 		setEventFunction(node, key, optValue);
-	} else if (key === "value") {
+	} else if (key === "value" && node.getAttribute("type") !== "file") {
 		(<HTMLInputElement>node).value = optValue;
 	} else {
 		node.setAttribute(optKey, optValue);
